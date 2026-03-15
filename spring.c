@@ -1,13 +1,19 @@
 #include <stdio.h>
 #include "raylib.h"
 
-
+#define FPS 120
 #define WIDTH 900
 #define HEIGHT 600
 #define THICK 5
 #define MASS_WIDTH 100
 #define FLOOR_Y (HEIGHT*0.6)
 
+
+float x_mass;
+
+void drawSpring(){
+
+}
 
 
 void drawFloor()
@@ -17,10 +23,10 @@ void drawFloor()
     DrawLineEx(start,end,THICK,GRAY);
 }
 
-void drawMass(float x){
+void drawMass(){
     
 
-    Rectangle rect={x,FLOOR_Y-MASS_WIDTH-THICK/2, MASS_WIDTH,MASS_WIDTH};
+    Rectangle rect={x_mass,FLOOR_Y-MASS_WIDTH-THICK/2, MASS_WIDTH,MASS_WIDTH};
     DrawRectangleRec(rect,YELLOW);
 }
 
@@ -28,12 +34,20 @@ int main(){
 
     InitWindow(WIDTH, HEIGHT,"Simulating a Spring");
 
-    float x=0;
+
+
+    float dt;
+    float v=20;
+    SetTargetFPS(FPS);
     while(!WindowShouldClose()){
         BeginDrawing();
         ClearBackground(BLACK);
+        DrawFPS(10,10);
+        dt=GetFrameTime();
         drawFloor();
-        drawMass(x++);
+        x_mass+=v * dt;
+        drawMass();
+        drawSpring();
         DrawText("Spring On Mass Simulation",WIDTH/10,100,30,GREEN);
         EndDrawing();
     }
