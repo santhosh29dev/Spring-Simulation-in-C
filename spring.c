@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include "raylib.h"
 
@@ -7,17 +8,44 @@
 #define THICK 5
 #define MASS_WIDTH 100
 #define FLOOR_Y (HEIGHT*0.6)
-#define NUM_SE 8
-#define SPRING_EL 15
+#define NUM_SE 15
+#define SPRING_EL 70
+#define K 20
+#define X_REST (WIDTH/3)
+#define FRICTION 0.5
 
-float x_mass;
+
+float x_mass=WIDTH * 0.7;
+float v=20;
+float a=2;
+typedef struct{
+    Vector2 start,end;
+}SpringElem;
+
+SpringElem spring_elem[NUM_SE];
+
+
 
 void drawSpring(){
 
     float x_springdelta=x_mass /NUM_SE;
-    for(int i=0;i<NUM_SE;i++){
-        Vector2 start={x_springdelta *i,FLOOR_Y-MASS_WIDTH/2};
+    float y_end=sqrt(pow(SPRING_EL,2)-pow(x_springdelta,2));
+    for(int i=0;i<NUM_SE;i+=2){
+        
+        Vector2 start={x_springdelta *i,FLOOR_Y-MASS_WIDTH/2+SPRING_EL/2};
+        Vector2 end={start.x + x_springdelta,start.y-y_end};
+        spring_elem[i]= (SpringElem) {start,end};
+        DrawLineEx(start, end,THICK, LIGHTGRAY);
     }
+
+    for(int i=1;i<NUM_SE;i+=2){
+        Vector2 start=spring_elem[i-1].end;
+        Vector2 end={start.x + x_springdelta,start.y+y_end};
+        spring_elem[i]= (SpringElem){start,end};
+        DrawLineEx(start, end,THICK, LIGHTGRAY);
+    }
+
+    
 }
 
 
@@ -42,7 +70,6 @@ int main(){
 
 
     float dt;
-    float v=20;
     SetTargetFPS(FPS);
     while(!WindowShouldClose()){
         BeginDrawing();
@@ -50,10 +77,13 @@ int main(){
         DrawFPS(10,10);
         dt=GetFrameTime();
         drawFloor();
-        x_mass+=v * dt;
+        float friction=a>0? FRICTION : -FRICTION;
+        a= -K*(x_mass-X_REST)-v*FRICTION;
+        v+= a * dt;
+        x_mass+=v*dt;
         drawMass();
         drawSpring();
-        DrawText("Spring On Mass Simulation",WIDTH/10,100,30,GREEN);
+        DrawText("Mass On Spring Simulation",WIDTH/10,100,30,GREEN);
         EndDrawing();
     }
     CloseWindow();
