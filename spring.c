@@ -7,12 +7,17 @@
 #define THICK 5
 #define MASS_WIDTH 100
 #define FLOOR_Y (HEIGHT*0.6)
-
+#define NUM_SE 8
+#define SPRING_EL 15
 
 float x_mass;
 
 void drawSpring(){
 
+    float x_springdelta=x_mass /NUM_SE;
+    for(int i=0;i<NUM_SE;i++){
+        Vector2 start={x_springdelta *i,FLOOR_Y-MASS_WIDTH/2};
+    }
 }
 
 
